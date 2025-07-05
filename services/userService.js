@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userRepository = require("../repositories/userRepository");
 
-const registerUser = async ({ name, email, password, role }) => {
+const registerUser = async ({id, name, email, password, role }) => {
   // Check if user already exists
   const existingUser = await userRepository.findByEmail(email);
   if (existingUser) {
@@ -13,6 +13,7 @@ const registerUser = async ({ name, email, password, role }) => {
   const hashedPassword = await bcrypt.hash(password, salt);
   // Create user
   const user = await userRepository.createUser({
+    id,
     name,
     email,
     password: hashedPassword,
@@ -20,12 +21,12 @@ const registerUser = async ({ name, email, password, role }) => {
   });
   return user;
 };
+//login user
 const loginUser = async ({ email, password }) => {
   const user = await userRepository.findByEmail(email);
   if (!user) {
     throw new Error("Invalid email or password");
   }
-
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
     throw new Error("Invalid email or password");
@@ -40,7 +41,28 @@ const loginUser = async ({ email, password }) => {
   return { token, user };
 };
 
+const updateUser = async (id, updates) => {
+  // Optionally hash password if it’s being updated
+  if (updates.password) {
+    const salt = await bcrypt.genSalt(10);
+    updates.password = await bcrypt.hash(updates.password, salt);
+  }
+  return userRepository.updateUser(id, updates);
+};
+//delete
+const softDeleteUser = async (id) => {
+  const user = await userRepository.findById(id);
+  if (!user) {
+    throw new Error("User not found");
+  }
+  user.isDeleted = true;
+  await user.save();
+  return user;
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  updateUser,
+  softDeleteUser
 };

@@ -11,6 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/userRole" , require("./routes/userRoleRoutes"))
 
 app.listen(process.env.PORT || 5000, () => {
   console.log("Server is running");
