@@ -1,15 +1,15 @@
 const { body } = require('express-validator');
 
 const createValidation = [
-    body('roleName').not().isEmpty().withMessage('Role Name is required'),
+    body('name').not().isEmpty().withMessage('Role name is required'),
 ];
 
 const updateValidation = [
-    body('roleName').not().isEmpty().withMessage('Role Name is required to update'),
+    body('name').not().isEmpty().withMessage('Role name is required to update'),
 ];
 
 const deleteValidation = [
-    body('roleName').not().isEmpty().withMessage('Role Name is required to delete'),
+    body('name').not().isEmpty().withMessage('Role name is required to delete'),
 ];
 
 module.exports = {

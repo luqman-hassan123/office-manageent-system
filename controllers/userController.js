@@ -19,7 +19,6 @@ const updateUser = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
     const updatedUser = await userService.updateUser(id, updates);
-
     res.status(200).json({
       success: true,
       message: "User updated successfully",
@@ -33,11 +32,12 @@ const updateUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { token, user } = await userService.loginUser(req.body);
+    console.log("user role is  ", req.user)
     res.status(200).json({
       success: true,
       message: "Login successful",
       token,
-      user,
+      user,       //do not show user data only token 
     });
   } catch (err) {
     res.status(401).json({ success: false, message: err.message });
@@ -60,17 +60,34 @@ const deleteUser = async (req, res) => {
 // Get all users (with pagination, search, filtering)
 const getUsers = async (req, res) => {
   try {
-    const { page, limit, role, name } = req.query;
-    const [users, total] = await userRepository.getUsers({ page, limit, role, name });
-
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const { role, name } = req.query;
+    const [users, total] = await userService.getUsers({ page, limit, role, name });
     res.status(200).json({
       success: true,
       total,
-      // which page the user want to strat from by default 1 
-      page: Number(page) || 1,
-      //how many record to be shown per page
-      limit: Number(limit) || 10,
+      page,
+      limit,
       users,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+ // Reset password (by the user themselves)
+const resetPassword = async (req, res) => {
+  try {
+    const userId = req.user.id; // extracted from token via middleware
+    const { newPassword } = req.body;
+    if (!newPassword) {
+      return res.status(400).json({ success: false, message: "New password is required." });
+    }
+    const updatedUser = await userService.resetPassword(userId, newPassword);
+    res.status(200).json({
+      success: true,
+      message: "Password reset successful",
+      user: updatedUser,
     });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
@@ -82,5 +99,6 @@ module.exports = {
   loginUser,
   updateUser,
   deleteUser,
-  getUsers
+  getUsers,
+  resetPassword
 };

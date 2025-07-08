@@ -3,14 +3,14 @@ const userRoleService = require("../services/userRoleService");
 //create user role
 const createUserRole = async (req, res) => {
   try {
-    const userRole = await userRoleService.createUser(req.body);
+    const userRole = await userRoleService.createRole(req.body);
     res.status(201).json({
       success: true,
       message: "User role created successfully",
       userRole,
     });
   } catch (err) {
-    res.status(400).json({ success: false, message });
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 //get all user roles
@@ -26,7 +26,6 @@ const getAllUserRoles = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 };
-
 // get user role by id
 const getUserRoleById = async (req, res) => {
   try {
@@ -40,7 +39,6 @@ const getUserRoleById = async (req, res) => {
     res.status(404).json({ success: false, message: "User role not found" });
   }
 };
-
 //get user role by name
 const getUserRoleByName = async (req, res) => {
   try {
@@ -68,7 +66,6 @@ const updateUserRole = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 };
-
 //delete user role
 const deleteUserRole = async (req, res) => {
   try {
