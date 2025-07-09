@@ -10,7 +10,9 @@ const findUserRoleById = (id) => User.findById(id);
 const findById = (id) => User.findById(id);
 // Find user by id and populate role
 const findByIdWithRole = (id) => {
-  return User.findById(id);
+  return User.findById(id)
+  .select("name email role")
+  .populate("role", "name");
 };
 // update user
 const updateUser = (id, updates) => {
@@ -18,21 +20,24 @@ const updateUser = (id, updates) => {
 };
 //get all users
 const getAllUsers = () => {
-  return User.find({ isDeleted: false }).populate("role", "name");
+  return User.find({ isDeleted: false })
+    .select("name  role")
+    .populate("role", "name"); 
 };
+const resetPassword = (userId, newHashedPassword) => {
+  return User.findByIdAndUpdate(
+    userId,
+    { password: newHashedPassword },
+    { new: true }
+  );
+};
+
 // delete user
 const softDeleteUser = (id) => {
   return User.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
 };
-// Reset user password (used in password reset)
-const resetPassword = (id, newHashedPassword) => {
-  return User.findByIdAndUpdate(
-    id,
-    { password: newHashedPassword },
-    { new: true, runValidators: true }
-  );
-};
-// Get users with pagination, filtering
+
+// Get users with pagination, filtering (used in controller)
 const getUsers = ({ page = 1, limit = 10, role, name }) => {
   const filters = { isDeleted: false };
   if (role) filters.role = role;

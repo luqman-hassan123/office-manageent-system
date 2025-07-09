@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const userRepository = require("../repositories/userRepository");
 const userRoleRepository = require ("../repositories/userRoleRepository")
 
-const registerUser = async ({id, name, email, password, role }) => {
+const registerUser = async ({ id, name, email, password, role }) => {
   // Check if user already exists
   const existingUser = await userRepository.findByEmail(email);
   if (existingUser) {
@@ -13,20 +13,22 @@ const roleDoc = await userRoleRepository.findByName(role);
   if (!roleDoc) {
     throw new Error(`Role "${role}" not found`);
   }
-  // Hash password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
-  // Create user
-  //console.log("Resolved roleDoc:", roleDoc);
-
   const user = await userRepository.createUser({
     id,
     name,
     email,
     password: hashedPassword,
-    role: roleDoc._id, // store ObjectId,
+    role: roleDoc._id, 
   });
-  return user;
+  user.password = undefined;
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
 };
 //login user
 const loginUser = async ({ email, password }) => {
@@ -34,22 +36,18 @@ const loginUser = async ({ email, password }) => {
   if (!user) {
     throw new Error("Invalid email or password");
   }
-  //console.log("userFirst",user)
-  // Compare given password with stored hashed password
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
     throw new Error("Invalid email or password");
   }
-  //  console.log("userTest",user)
-  // Generate JWT token with user ID and role
   const token = jwt.sign(
-    { id: user._id, role: "Admin" },
+    { id: user._id, role: user.role  },
     process.env.JWT_SECRET,
     {
-      expiresIn: "7d",
+      expiresIn: process.env.JWT_EXPIRES_IN,
     }
   );
-  return { token, user };
+  return { token };
 };
 //get users
 const getUsers = async ({ page, limit, role, name }) => {
@@ -73,7 +71,7 @@ const softDeleteUser = async (id) => {
   await user.save();
   return user;
 };
-const resetPassword = async (id, newPassword) => {
+const resetPassword = async (_id, newPassword) => {
   // Hash the new password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(newPassword, salt);
@@ -88,8 +86,8 @@ const resetPassword = async (id, newPassword) => {
 module.exports = {
   registerUser,
   loginUser,
+  getUsers,
   updateUser,
   softDeleteUser,
-  resetPassword,
-  getUsers
+  resetPassword
 };

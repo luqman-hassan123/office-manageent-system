@@ -4,7 +4,6 @@ const {
   createUserRole,
   getAllUserRoles,
   getUserRoleById,
-  getUserRoleByName,
   updateUserRole,
   deleteUserRole,
 } = require("../controllers/userRoleController");
@@ -17,8 +16,7 @@ const {
 router.post("/", createValidation, createUserRole);
 router.get("/", getAllUserRoles);
 router.get("/:id", getUserRoleById);
-router.get("/name/:name", getUserRoleByName);
-router.put("/:id", updateValidation, updateUserRole);
-router.delete("/:id", deleteValidation, deleteUserRole);
+router.put("/:id", [...updateValidation], updateUserRole);
+router.delete("/:id", [...deleteValidation], deleteUserRole);
 
-module.exports =  router;
+module.exports = router;

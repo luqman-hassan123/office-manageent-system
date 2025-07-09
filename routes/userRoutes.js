@@ -15,12 +15,9 @@ const {
   loginValidation,
 } = require("../validations/userValidation");
 
-// Register user
 router.post("/register", registerValidation, validate, registerUser);
-// Login user
 router.post("/login", loginValidation, validate, loginUser);
-//reset password
-router.put("/reset-password", protect, resetPassword);
+router.patch("/reset-password/id", protect, resetPassword);
 // Admin-only routes, applies to all routes below
 router.use(protect, authorizeRoles("Admin")); 
 router.put("/:id", updateUser);

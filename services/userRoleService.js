@@ -18,15 +18,6 @@ const getRoles = async () => {
         throw new Error('Error getting roles: ' + err.message);
     }
 };
-//get role by name
-const getUserRoleByName = async (name) =>{
-    try{
-        const role = await userRoleRepository.findByName (name);
-        return role;
-    }catch(err){
-        throw new Error('Error getting role by name: ' + err.message);
-    }
-};
 // get user role by id
 const getUserRoleById = async (id) =>{
     try{
@@ -39,17 +30,19 @@ const getUserRoleById = async (id) =>{
 // update user role 
 const updateRole = async ({name, permission}) =>{
     try{
+        console.log("Calling updateRole in repository with:", { name, permission });
         const role = await userRoleRepository.updateRole({name, permission});
+        console.log(updateRole)
         return role;
     }catch(err){
-        throw new Error('Error updating role: ' + err.message);
+        throw new Error('Error updating user role: ' + err.message);
     }
 };
 // delete user role
 const deleteRole = async (id) => {
-    const role = await userRoleRepository.findbyId(id);
+    const role = await userRoleRepository.getUserRoleById(id);
     if(!role){
-        throw new Error('Role not found');
+        throw new Error('Role not found' + err.message);
     }
     role.isdelete = true;
     await role.save();
@@ -59,7 +52,6 @@ module.exports = {
     createRole,
     updateRole,
     deleteRole,
-    getUserRoleByName,
     getUserRoleById,
     getRoles
 };

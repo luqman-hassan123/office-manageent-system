@@ -4,21 +4,18 @@ const userRole = require("../models/userRole");
 const createRole = (roleData) =>userRole.create(roleData);
 // get all roles
 const getAllRoles = () => userRole.find();
-// get role by name 
-const findByName  = (name) => userRole.findOne({name});
 //get user role by id
 const getUserRoleById = (id) => userRole.findById(id);
 //update role
 const updateRole = (id, roleData) => {
-  return userRole.findByIdAndUpdate(id, roleData, { new: true, runValidators: true });
-};
+    return userRole.updateOne(id, roleData);
+}
 //delete role
 const deleteRole = (id) => userRole.findByIdAndDelete(id);
 
 module.exports = {
     createRole,
     getAllRoles,
-    findByName,
     getUserRoleById,
     updateRole,
     deleteRole

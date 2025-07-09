@@ -7,7 +7,9 @@ const registerUser = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "User registered successfully",
-      user,
+      data: {
+        user,
+      },
     });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
@@ -22,7 +24,9 @@ const updateUser = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "User updated successfully",
-      updatedUser
+      data: {
+        updatedUser,
+      },
     });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
@@ -31,13 +35,11 @@ const updateUser = async (req, res) => {
 // login user
 const loginUser = async (req, res) => {
   try {
-    const { token, user } = await userService.loginUser(req.body);
-    console.log("user role is  ", req.user)
+    const { token } = await userService.loginUser(req.body);
     res.status(200).json({
       success: true,
       message: "Login successful",
-      token,
-      user,       //do not show user data only token 
+      data: { token },
     });
   } catch (err) {
     res.status(401).json({ success: false, message: err.message });
@@ -51,7 +53,9 @@ const deleteUser = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "User deleted successfully",
-      deletedUser,
+      data: {
+        deletedUser,
+      },
     });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
@@ -60,28 +64,37 @@ const deleteUser = async (req, res) => {
 // Get all users (with pagination, search, filtering)
 const getUsers = async (req, res) => {
   try {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
-    const { role, name } = req.query;
-    const [users, total] = await userService.getUsers({ page, limit, role, name });
-    res.status(200).json({
-      success: true,
-      total,
+    const { page, limit, role, name } = req.query;
+    const [users, total] = await userRepository.getUsers({
       page,
       limit,
-      users,
+      role,
+      name,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Users fetched successfully",
+      data: {
+        total,
+        page: Number(page) || 1,
+        limit: Number(limit) || 10,
+        users,
+      },
     });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
 };
- // Reset password (by the user themselves)
+// Reset password (by the user themselves)
 const resetPassword = async (req, res) => {
   try {
     const userId = req.user.id; // extracted from token via middleware
     const { newPassword } = req.body;
     if (!newPassword) {
-      return res.status(400).json({ success: false, message: "New password is required." });
+      return res
+        .status(400)
+        .json({ success: false, message: "New password is required." });
     }
     const updatedUser = await userService.resetPassword(userId, newPassword);
     res.status(200).json({
@@ -100,5 +113,5 @@ module.exports = {
   updateUser,
   deleteUser,
   getUsers,
-  resetPassword
+  resetPassword,
 };
