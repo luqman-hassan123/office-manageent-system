@@ -20,3 +20,5 @@ router.get("/:id", getUserRoleById);
 router.get("/:roleName", getUserRoleByName);
 router.put("/:id", [...updateValidation], updateUserRole);
 router.delete("/:id", [...deleteValidation], deleteUserRole);
+
+module.exports = router;
