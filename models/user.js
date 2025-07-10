@@ -18,9 +18,13 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     role: {
-      type: String,
-      enum: ["Admin", "Manager", "Employee"],
-      default: "Employee",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "userRole",   // Reference to UserRole model
+      required: true,
+    },
+    resetPasswordExpires: {
+      type: Date,
+      default: null,
     },
       isDeleted: {
     type: Boolean,
