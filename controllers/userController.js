@@ -1,6 +1,5 @@
 const userService = require("../services/userService");
 
-//registor new user
 const registerUser = async (req, res) => {
   try {
     const user = await userService.registerUser(req.body);
@@ -18,18 +17,17 @@ const registerUser = async (req, res) => {
 // update user
 const updateUser = async (req, res) => {
   try {
-    const { id } = req.params;
-    const updates = req.body;
-    const updatedUser = await userService.updateUser(id, updates);
-    res.status(200).json({
-      success: true,
-      message: "User updated successfully",
-      data: {
-        updatedUser,
-      },
-    });
+    const id = req.params.id;
+    const updatedData = req.body;
+    const updatedUser = await userService.updateUser(id, updatedData);
+    if (!updatedUser) {
+      console.error(`User not found with ID: ${userId}`);
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    res.status(200).json({ success: true, message: "User updated successfully", user: updatedUser });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    console.error("Error updating user:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 // login user
@@ -61,17 +59,18 @@ const deleteUser = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 };
-// Get all users (with pagination, search, filtering)
+// Get all users
 const getUsers = async (req, res) => {
+  console.log("Users:", getUsers);
+
   try {
     const { page, limit, role, name } = req.query;
-    const [users, total] = await userRepository.getUsers({
+    const [users, total] = await userService.getUsers({
       page,
       limit,
       role,
       name,
     });
-
     res.status(200).json({
       success: true,
       message: "Users fetched successfully",
@@ -89,7 +88,7 @@ const getUsers = async (req, res) => {
 // Reset password (by the user themselves)
 const resetPassword = async (req, res) => {
   try {
-    const userId = req.user.id; // extracted from token via middleware
+    const userId = req.user.id;
     const { newPassword } = req.body;
     if (!newPassword) {
       return res

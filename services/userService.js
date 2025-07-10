@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const userRepository = require("../repositories/userRepository");
 const userRoleRepository = require ("../repositories/userRoleRepository")
 
-const registerUser = async ({ id, name, email, password, role }) => {
+const registerUser = async ({ name, email, password, role }) => {
   // Check if user already exists
   const existingUser = await userRepository.findByEmail(email);
   if (existingUser) {
@@ -16,7 +16,6 @@ const roleDoc = await userRoleRepository.findByName(role);
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
   const user = await userRepository.createUser({
-    id,
     name,
     email,
     password: hashedPassword,
@@ -41,7 +40,7 @@ const loginUser = async ({ email, password }) => {
     throw new Error("Invalid email or password");
   }
   const token = jwt.sign(
-    { id: user._id, role: user.role  },
+    { id: user._id, role: user.role.name  },
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_EXPIRES_IN,
@@ -53,19 +52,19 @@ const loginUser = async ({ email, password }) => {
 const getUsers = async ({ page, limit, role, name }) => {
   return userRepository.getUsers({ page, limit, role, name });
 };
-const updateUser = async (id, updates) => {
-  // Optionally hash password if it’s being updated
+
+const updateUser = async (_id, updates) => {
   if (updates.password) {
     const salt = await bcrypt.genSalt(10);
     updates.password = await bcrypt.hash(updates.password, salt);
   }
-  return userRepository.updateUser(id, updates);
+  return userRepository.updateUser(_id, updates);
 };
 //delete
 const softDeleteUser = async (id) => {
   const user = await userRepository.findById(id);
   if (!user) {
-    throw new Error("User not found");
+    throw new Error("User not found to be delete");
   }
   user.isDeleted = true;
   await user.save();
@@ -76,7 +75,7 @@ const resetPassword = async (_id, newPassword) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(newPassword, salt);
   // Update password using repository
-  const updatedUser = await userRepository.resetPassword(id, hashedPassword);
+  const updatedUser = await userRepository.resetPassword(_id, hashedPassword);
   if (!updatedUser) {
     throw new Error("User not found or password reset failed.");
   }

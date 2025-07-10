@@ -1,12 +1,8 @@
 const User = require("../models/user");
 
-// create new user
 const createUser = (userData) => User.create(userData);
-// find user by email
-const findByEmail = (email) => User.findOne({ email });
-// find user by id
+const findByEmail = (email) => User.findOne({ email }).populate("role");
 const findUserRoleById = (id) => User.findById(id);
-//find by id
 const findById = (id) => User.findById(id);
 // Find user by id and populate role
 const findByIdWithRole = (id) => {
@@ -14,9 +10,11 @@ const findByIdWithRole = (id) => {
   .select("name email role")
   .populate("role", "name");
 };
-// update user
-const updateUser = (id, updates) => {
-  return User.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
+const updateUser = (id, userData) => {
+  return User.findByIdAndUpdate(id, userData, {
+    new: true,
+    runValidators: true,
+  });
 };
 //get all users
 const getAllUsers = () => {
@@ -24,19 +22,16 @@ const getAllUsers = () => {
     .select("name  role")
     .populate("role", "name"); 
 };
-const resetPassword = (userId, newHashedPassword) => {
+const resetPassword = (_id, newHashedPassword) => {
   return User.findByIdAndUpdate(
-    userId,
+    _id,
     { password: newHashedPassword },
     { new: true }
   );
 };
-
-// delete user
 const softDeleteUser = (id) => {
   return User.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
 };
-
 // Get users with pagination, filtering (used in controller)
 const getUsers = ({ page = 1, limit = 10, role, name }) => {
   const filters = { isDeleted: false };

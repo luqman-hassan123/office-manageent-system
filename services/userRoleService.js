@@ -30,9 +30,7 @@ const getUserRoleById = async (id) =>{
 // update user role 
 const updateRole = async ({name, permission}) =>{
     try{
-        console.log("Calling updateRole in repository with:", { name, permission });
         const role = await userRoleRepository.updateRole({name, permission});
-        console.log(updateRole)
         return role;
     }catch(err){
         throw new Error('Error updating user role: ' + err.message);

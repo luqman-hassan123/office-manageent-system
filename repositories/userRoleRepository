@@ -4,6 +4,9 @@ const userRole = require("../models/userRole");
 const createRole = (roleData) =>userRole.create(roleData);
 // get all roles
 const getAllRoles = () => userRole.find();
+const findByName = async (name) => {
+  return await userRole.findOne({ name });
+};
 //get user role by id
 const getUserRoleById = (id) => userRole.findById(id);
 //update role
@@ -14,6 +17,7 @@ const updateRole = (id, roleData) => {
 const deleteRole = (id) => userRole.findByIdAndDelete(id);
 
 module.exports = {
+    findByName,
     createRole,
     getAllRoles,
     getUserRoleById,
