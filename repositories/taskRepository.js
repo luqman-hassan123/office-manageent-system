@@ -21,7 +21,9 @@ const updateTask = (taskId, updateData) => {
   });
 };
 
-const deleteTask = (taskId) => Task.findByIdAndDelete(taskId);
+const deleteTask = (taskId) => {
+  return Task.findByIdAndUpdate(taskId, { isDeleted: true }, { new: true });
+};
 
 const addComment = async (taskId, commentData) => {
   const task = await Task.findById(taskId);
