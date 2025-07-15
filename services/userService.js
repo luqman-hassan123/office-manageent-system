@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const userRepository = require("../repositories/userRepository");
 const userRoleRepository = require ("../repositories/userRoleRepository")
 
-const registerUser = async ({ name, email, password, role }) => {
+const registerUser = async ({id, name, email, password, role }) => {
   // Check if user already exists
   const existingUser = await userRepository.findByEmail(email);
   if (existingUser) {
@@ -39,18 +39,22 @@ const loginUser = async ({ email, password }) => {
   if (!isMatch) {
     throw new Error("Invalid email or password");
   }
+
+  const roleName = user?.role?.name;
+  console.log("Role being signed:", roleName);
+
+  console.log("user.role:", user.role);
+console.log("roleName:", roleName);
+
+  console.log(user.role.name);
   const token = jwt.sign(
-    { id: user._id, role: user.role.name  },
+    { id: user._id, role: user.role },
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_EXPIRES_IN,
     }
   );
-  return { token };
-};
-//get users
-const getUsers = async ({ page, limit, role, name }) => {
-  return userRepository.getUsers({ page, limit, role, name });
+  return { token, user };
 };
 
 const updateUser = async (_id, updates) => {
