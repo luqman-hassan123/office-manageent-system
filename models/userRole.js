@@ -2,11 +2,12 @@ const mongoose = require("mongoose");
 
 const userRole = new mongoose.Schema(
   {
-    rolename: {
+    name: {
       type: String,
       required: true,
+      unique: true,
     },
-    description: {
+    permission: {
       type: String,
       required: true,
     },
@@ -15,7 +16,7 @@ const userRole = new mongoose.Schema(
     default: false
   },
   },
-  { timestamps:true }
+  { timestamps: true }
 );
 
-module.exports = mongoose.model("userRole" , userRole);
+module.exports = mongoose.model("userRole",userRole);
