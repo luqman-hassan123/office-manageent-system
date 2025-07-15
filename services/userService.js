@@ -1,25 +1,33 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userRepository = require("../repositories/userRepository");
+const userRoleRepository = require ("../repositories/userRoleRepository")
 
-const registerUser = async ({ id, name, email, password, role }) => {
+const registerUser = async ({ name, email, password, role }) => {
   // Check if user already exists
   const existingUser = await userRepository.findByEmail(email);
   if (existingUser) {
     throw new Error("User already exists");
   }
-  // Hash password
+const roleDoc = await userRoleRepository.findByName(role);
+  if (!roleDoc) {
+    throw new Error(`Role "${role}" not found`);
+  }
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
-  // Create user
   const user = await userRepository.createUser({
-    id,
     name,
     email,
     password: hashedPassword,
-    role,
+    role: roleDoc._id, 
   });
-  return user;
+  user.password = undefined;
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
 };
 //login user
 const loginUser = async ({ email, password }) => {
@@ -40,37 +48,57 @@ console.log("roleName:", roleName);
 
   console.log(user.role.name);
   const token = jwt.sign(
-    { id: user._id, role: roleName  },
+
+    { id: user._id, role: user.role.name  },
+
     process.env.JWT_SECRET,
     {
-      expiresIn: "7d",
+      expiresIn: process.env.JWT_EXPIRES_IN,
     }
   );
   return { token };
+
+};
+//get users
+const getUsers = async ({ page, limit, role, name }) => {
+  return userRepository.getUsers({ page, limit, role, name });
 };
 
-const updateUser = async (id, updates) => {
-  // Optionally hash password if it’s being updated
+const updateUser = async (_id, updates) => {
   if (updates.password) {
     const salt = await bcrypt.genSalt(10);
     updates.password = await bcrypt.hash(updates.password, salt);
   }
-  return userRepository.updateUser(id, updates);
+  return userRepository.updateUser(_id, updates);
 };
 //delete
 const softDeleteUser = async (id) => {
   const user = await userRepository.findById(id);
   if (!user) {
-    throw new Error("User not found");
+    throw new Error("User not found to be delete");
   }
   user.isDeleted = true;
   await user.save();
   return user;
 };
+const resetPassword = async (_id, newPassword) => {
+  // Hash the new password
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
+  // Update password using repository
+  const updatedUser = await userRepository.resetPassword(_id, hashedPassword);
+  if (!updatedUser) {
+    throw new Error("User not found or password reset failed.");
+  }
+  return updatedUser;
+};
 
 module.exports = {
   registerUser,
   loginUser,
+  getUsers,
   updateUser,
   softDeleteUser,
+  resetPassword
+
 };

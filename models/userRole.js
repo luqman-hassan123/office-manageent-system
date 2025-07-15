@@ -2,20 +2,21 @@ const mongoose = require("mongoose");
 
 const userRole = new mongoose.Schema(
   {
-    rolename: {
+    name: {
       type: String,
       required: true,
+      unique: true,
     },
-    description: {
+    permission: {
       type: String,
       required: true,
     },
       isDeleted: {
     type: Boolean,
     default: false
-  },
-  },
-  { timestamps:true }
+  };
+  { timestamps: true }
 );
 
-module.exports = mongoose.model("userRole" , userRole);
+module.exports = mongoose.model("userRole",userRole);
+

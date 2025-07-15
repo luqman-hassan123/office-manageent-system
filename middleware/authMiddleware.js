@@ -11,10 +11,11 @@ const protect = async (req, res, next) => {
   try {
     // Middleware to allow only specific roles to access a route
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user =decoded;
-    console.log("Decoded user with role:", req.user);
-    console.log("Role after populate:", req.user.role);
-
+    const user = await userRepository.findByIdWithRole(decoded.id);
+     if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+      req.user = decoded;
     next();
   } catch (err) {
     throw new Error("Error getting roles: " + err.message);
@@ -36,10 +37,9 @@ const protect = async (req, res, next) => {
 
 const authorizeRoles = (...allowedRoles) => {
   return (req, res, next) => {
-    console.log("allowed",allowedRoles)
-    const currentRoleName = req.user?.role;
-    console.log("Current Role Name:", currentRoleName);
-    if (!allowedRoles.map(r => r.toLowerCase()).includes(currentRoleName)) {
+    const userRole = req.user?.role;
+    console.log("role",userRole)
+    if (!allowedRoles.includes(userRole)) {
       return res.status(403).json({ message: "Forbidden: Insufficient role" });
     }
     next();
