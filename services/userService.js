@@ -91,5 +91,6 @@ module.exports = {
   loginUser,
   getUsers,
   updateUser,
-  softDeleteUser
+  softDeleteUser,
+  resetPassword
 };

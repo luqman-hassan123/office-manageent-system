@@ -1,20 +1,10 @@
 const User = require("../models/user");
 
-// find user by email
-const findByEmail = (email) => User.findOne({ email });
-// find user by id
-const findUserRoleById = (id) => User.findById(id);
-// create new user
+
 const createUser = (userData) => User.create(userData);
 const findByEmail = (email) => User.findOne({ email }).populate("role");
 const findUserRoleById = (id) => User.findById(id);
 const findById = (id) => User.findById(id);
-// Find user by id and populate role
-const findByIdWithRole = (id) => {
-  return User.findById(id)
-  .select("name email role")
-  .populate("role", "name");
-};
 const updateUser = (id, userData) => {
   return User.findByIdAndUpdate(id, userData, {
     new: true,
