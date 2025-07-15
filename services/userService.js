@@ -39,14 +39,25 @@ const loginUser = async ({ email, password }) => {
   if (!isMatch) {
     throw new Error("Invalid email or password");
   }
+
+  const roleName = user?.role?.name;
+  console.log("Role being signed:", roleName);
+
+  console.log("user.role:", user.role);
+console.log("roleName:", roleName);
+
+  console.log(user.role.name);
   const token = jwt.sign(
+
     { id: user._id, role: user.role.name  },
+
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_EXPIRES_IN,
     }
   );
   return { token };
+
 };
 //get users
 const getUsers = async ({ page, limit, role, name }) => {
@@ -89,4 +100,5 @@ module.exports = {
   updateUser,
   softDeleteUser,
   resetPassword
+
 };

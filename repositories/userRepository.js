@@ -16,6 +16,10 @@ const updateUser = (id, userData) => {
     runValidators: true,
   });
 };
+// Find user by ID and populate role
+const findByIdWithRole = (id) => {
+  return User.findById(id).populate({ path: "role", select: "name" }); 
+};
 //get all users
 const getAllUsers = () => {
   return User.find({ isDeleted: false })

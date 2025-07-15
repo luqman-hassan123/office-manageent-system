@@ -19,17 +19,13 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "userRole",   // Reference to UserRole model
+      ref: "userRole",   
       required: true,
     },
     resetPasswordExpires: {
       type: Date,
       default: null,
     },
-      isDeleted: {
-    type: Boolean,
-    default: false
-  },
   },
   { timestamps: true }
 );

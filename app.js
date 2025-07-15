@@ -2,8 +2,10 @@ const express = require('express');
 const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db");
-const userRoutes = require("./routes/userRoutes")
-const userRoleRoutes = require("./routes/userRoleRoutes")
+
+const userRoutes = require("./routes/userRoutes");
+const userRoleRoutes = require("./routes/userRoleRoutes");
+const attendanceRoutes = require("./routes/attendanceRoutes");
 
 dotenv.config();
 connectDB();
@@ -13,7 +15,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/users", userRoutes);
-app.use("/api/userRole" , userRoleRoutes)
+app.use("/api/userRole", userRoleRoutes);
+app.use("/api/attendance", attendanceRoutes);
 
 app.listen(process.env.PORT || 5000, () => {
   console.log("Server is running");
