@@ -11,10 +11,10 @@ const {
 
 const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 
-router.post("/mark", authorizeRoles("Employee"), markAttendance);
-router.get("/me", protect, authorizeRoles("Employee"), getMyAttendance);
-router.post("/team", protect, authorizeRoles("Manager"), getTeamAttendance);
-router.get("/all", protect, authorizeRoles("Admin"), getAllAttendance);
-router.get("/report", protect, authorizeRoles("Admin"), getAttendanceReport);
+router.post("/mark", protect , markAttendance);
+router.get("/me", protect, getMyAttendance);
+router.get("/team", protect, authorizeRoles("manager"), getTeamAttendance);
+router.get("/all", protect, authorizeRoles("admin"), getAllAttendance);
+router.get("/report", protect, authorizeRoles("admin"), getAttendanceReport);
 
 module.exports = router;

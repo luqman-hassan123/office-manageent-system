@@ -1,15 +1,19 @@
-const Attendance = require("../models/attendance");
+const Attendance = require("../models/Attendance");
 
 const markAttendance = (data) => {
-  Attendance.create(data);
+  return Attendance.create(data);
 };
 
 const getAttendanceByUser = (id) => {
   return Attendance.findOne({ user: id });
 };
 
+// const getAllAttendance = () => {
+//   return Attendance.find().populate("user", "role");
+// };
+
 const getAllAttendance = () => {
-  return Attendance.find().populate("user", "name email");
+  return Attendance.find().populate({ path: "userRole", select: "name" });
 };
 
 const getAttendanceByTeam = (teamUserIds) => {

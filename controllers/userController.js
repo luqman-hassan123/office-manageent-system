@@ -32,12 +32,11 @@ const updateUser = async (req, res) => {
 // login user
 const loginUser = async (req, res) => {
   try {
-    const { token, user } = await userService.loginUser(req.body);
+    const { token } = await userService.loginUser(req.body);
     res.status(200).json({
       success: true,
       message: "Login successful",
       token,
-      user,
     });
   } catch (err) {
     res.status(401).json({ success: false, message: err.message });

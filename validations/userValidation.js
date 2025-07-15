@@ -19,8 +19,8 @@ const registerValidation = [
   body("role")
     .notEmpty()
     .withMessage("Role required")
-    .isIn(["Admin", "Manager", "Employee"])
-    .withMessage("role must be Admin, Manager or Employee"),
+    .isIn(["admin", "manager", "employee"])
+    .withMessage("role must be admin, manager or employee"),
 ];
 
 const loginValidation = [

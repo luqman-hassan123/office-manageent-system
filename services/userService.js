@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userRepository = require("../repositories/userRepository");
 
-const registerUser = async ({id, name, email, password, role }) => {
+const registerUser = async ({ id, name, email, password, role }) => {
   // Check if user already exists
   const existingUser = await userRepository.findByEmail(email);
   if (existingUser) {
@@ -31,14 +31,22 @@ const loginUser = async ({ email, password }) => {
   if (!isMatch) {
     throw new Error("Invalid email or password");
   }
+
+  const roleName = user?.role?.name;
+  console.log("Role being signed:", roleName);
+
+  console.log("user.role:", user.role);
+console.log("roleName:", roleName);
+
+  console.log(user.role.name);
   const token = jwt.sign(
-    { id: user._id, role: user.role },
+    { id: user._id, role: roleName  },
     process.env.JWT_SECRET,
     {
       expiresIn: "7d",
     }
   );
-  return { token, user };
+  return { token };
 };
 
 const updateUser = async (id, updates) => {
@@ -64,5 +72,5 @@ module.exports = {
   registerUser,
   loginUser,
   updateUser,
-  softDeleteUser
+  softDeleteUser,
 };

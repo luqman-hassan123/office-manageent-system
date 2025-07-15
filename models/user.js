@@ -18,14 +18,14 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     role: {
-      type: String,
-      enum: ["Admin", "Manager", "Employee"],
-      default: "Employee",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "userRole",
+      required: true,
     },
-      isDeleted: {
-    type: Boolean,
-    default: false
-  },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

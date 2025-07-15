@@ -10,8 +10,12 @@ const userRole = new mongoose.Schema(
       type: String,
       required: true,
     },
+      isDeleted: {
+    type: Boolean,
+    default: false
   },
-  { timestamp: true }
+  },
+  { timestamps:true }
 );
 
-module.exports = mongoose.Aggregate("userRole", userRole);
+module.exports = mongoose.model("userRole" , userRole);

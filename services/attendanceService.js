@@ -1,21 +1,29 @@
 const attendanceRepository = require("../repositories/attendanceRepository");
 
-const markAttendance = async (userId, { checkIn, checkOut, type }) => {
-  const today = new Date().toISOString().slice(0, 10);
+const markAttendance = async (userId, { checkInTime, checkOutTime, attendanceType }) => {
+  const checkIn = new Date(checkInTime);
+  const checkOut = checkOutTime ? new Date(checkOutTime) : null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   const attendanceData = {
-    checkIn,
-    checkOut,
-    type,
+    user: userId,
+    date: today,
+    checkInTime: checkIn,
+    checkOutTime: checkOut,
+    attendanceType: attendanceType || "Onsite",
     status: determineStatus(checkIn),
   };
-  return attendanceRepository.markAttendance(userId, today, attendanceData);
+
+  return attendanceRepository.markAttendance(attendanceData);
 };
 
 const determineStatus = (checkInTime) => {
   const officeStart = new Date();
-  officeStart.setHours(9, 15);
-const userCheckIn = new Date(`${data()}T${checkInTime}:00`);
-  if (userCheckIn > officeStart) return "Late";
+  officeStart.setHours(9, 15, 0, 0); 
+
+  if (checkInTime > officeStart) return "Late";
   return "Present";
 };
 

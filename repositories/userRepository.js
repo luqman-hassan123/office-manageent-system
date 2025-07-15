@@ -1,7 +1,10 @@
 const User = require("../models/user");
 
-// find user by email
-const findByEmail = (email) => User.findOne({ email });
+const findByEmail = (email) =>
+  User.findOne({ email }).populate({
+    path: "role",
+    select: "name"
+  });
 // find user by id
 const findUserRoleById = (id) => User.findById(id);
 // create new user
@@ -9,6 +12,10 @@ const createUser = (userData) => User.create(userData);
 // update user
 const updateUser = (id, updates) => {
   return User.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
+};
+// Find user by ID and populate role
+const findByIdWithRole = (id) => {
+  return User.findById(id).populate({ path: "role", select: "name" }); 
 };
 //get all users
 const getAllUsers = () => User.find();
@@ -36,6 +43,7 @@ module.exports = {
   findByEmail,
   findUserRoleById,
   createUser,
+  findByIdWithRole,
   updateUser,
   getAllUsers,
   softDeleteUser,

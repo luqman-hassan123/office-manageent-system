@@ -11,19 +11,35 @@ const protect = async (req, res, next) => {
   try {
     // Middleware to allow only specific roles to access a route
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await userRepository.findById(decoded.id);
-    // console.log(decoded)
+    req.user =decoded;
+    console.log("Decoded user with role:", req.user);
+    console.log("Role after populate:", req.user.role);
+
     next();
   } catch (err) {
     throw new Error("Error getting roles: " + err.message);
   }
 };
-// Middleware to allow only specific roles to access a route
+//Middleware to allow only specific roles to access a route
+// const authorizeRoles = (...allowedRoles) => {
+//   return (req, res, next) => {
+//     const userRoleName = req.user?.role; 
+//     console.log("role name is ", userRoleName)
+//     console.log("Allowed Roles:", allowedRoles);
+//     console.log("Current Role:", req.user?.role);
+//     if (!allowedRoles.includes(req.user?.role)) {
+//       return res.status(403).json({ message: "Forbidden: Insufficient role" });
+//     }
+//     next();
+//   };
+// };
+
 const authorizeRoles = (...allowedRoles) => {
   return (req, res, next) => {
-    //const userRole = req.user?.role;
-    //console.log("Current role:", userRole);
-    if (!allowedRoles.includes(req.user?.role)) {
+    console.log("allowed",allowedRoles)
+    const currentRoleName = req.user?.role;
+    console.log("Current Role Name:", currentRoleName);
+    if (!allowedRoles.map(r => r.toLowerCase()).includes(currentRoleName)) {
       return res.status(403).json({ message: "Forbidden: Insufficient role" });
     }
     next();
